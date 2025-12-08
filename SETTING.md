@@ -1,4 +1,4 @@
-# 🎯 Claude Code 학습 과제 세팅 가이드 v5
+# 🎯 Claude Code 학습 과제 세팅 가이드 v6
 
 > **목적**: 학습 목표 달성 + 과제 수행 보조
 > **핵심**: Task Manager 중심의 학습 워크플로우
@@ -66,7 +66,9 @@
     │   ├── analyzer.md
     │   └── checker.md
     │
-    ├── commands/          # ⚡ 슬래시 커맨드 (5개)
+    ├── commands/          # ⚡ 슬래시 커맨드 (7개)
+    │   ├── start.md       # 세션 시작
+    │   ├── end.md         # 세션 종료
     │   ├── setup.md
     │   ├── hint.md
     │   ├── check.md
@@ -77,8 +79,9 @@
         ├── learning.md        # 학습 목표 & 유의점
         ├── tasks.md           # 태스크 목록
         ├── progress.json      # 진행 상황
-        └── logs/              # 태스크별 로그
-            └── task-[n].md
+        └── logs/              # 로그 폴더
+            ├── task-[n].md            # 태스크별 완료 로그
+            └── session-YYYY-MM-DD.md  # 일일 세션 로그
 ```
 
 ---
@@ -101,20 +104,37 @@ tools: Read, Write, Edit, Bash, Glob, Grep
 - 태스크 목록 관리 (`.claude/state/tasks.md`)
 - 진행 상황 추적 (`.claude/state/progress.json`)
 - 로그 작성 (`.claude/state/logs/`)
+- 세션 관리
 - 커밋 안내
 
-## 작업 시작 시
+## 세션 시작 시 (/start)
 
-1. `.claude/state/learning.md`에서 학습 목표/유의점 확인
-2. `.claude/state/tasks.md`에서 현재 태스크 확인
-3. 관련 파일 안내
+1. 오늘 날짜의 세션 로그 확인/생성: `.claude/state/logs/session-YYYY-MM-DD.md`
+2. `.claude/state/progress.json`에서 현재 상태 확인
+3. `.claude/state/tasks.md`에서 현재 태스크 확인
+4. 이전 세션의 "다음 세션에서 할 일" 확인
+5. 세션 로그에 시작 시간 기록
+6. 사용자에게 현재 상황 안내
 
-## 태스크 완료 시 (필수)
+## 세션 종료 시 (/end)
+
+1. 오늘 진행한 내용 요약
+2. 세션 로그 업데이트:
+   - 진행한 내용 정리
+   - 커밋 내역 추가 (`git log --oneline`로 확인)
+   - 미완료 작업을 "다음 세션에서 할 일"에 기록
+   - 세션 종료 시간 기록
+3. `.claude/state/progress.json` lastUpdated 갱신
+4. 커밋되지 않은 변경사항 확인 및 제안
+5. 사용자에게 요약 안내
+
+## 태스크 완료 시 (/done)
 
 1. `.claude/state/logs/task-[n].md` 작성
 2. `.claude/state/tasks.md` 업데이트 (체크 표시)
 3. `.claude/state/progress.json` 업데이트
-4. 커밋 메시지 제안:
+4. 세션 로그에도 완료 내용 기록
+5. 커밋 메시지 제안:
 ```
 
 Type: 내용
@@ -123,16 +143,40 @@ Type: 내용
 - 세부 내용
 
 ```
-5. 다음 태스크 안내
+6. 다음 태스크 안내
+
+## 힌트 사용 시 (/hint)
+
+1. `.claude/state/progress.json`의 hintsUsed 업데이트
+2. 세션 로그에 힌트 사용 기록
+
+## 커밋 시 (/commit)
+
+1. 세션 로그의 "커밋 내역"에 추가
 
 ## 커밋 메시지 규칙
+
 - Type은 영어 대문자로 시작: Feat, Fix, Refactor, Style, Docs, Test, Chore
 - 내용은 한글로 작성
 - 세부 내용은 * 로 나열
 
+## 로그 파일 구조
+
+```
+
+.claude/state/logs/
+├── task-1.md              # 완료된 태스크 로그
+├── task-2.md              # 완료된 태스크 로그
+├── session-2025-12-08.md  # 일일 세션 로그
+└── session-2025-12-09.md  # 일일 세션 로그
+
+```
+
 ## 금지사항
+
 - 코드 직접 작성 금지 (guide에게 위임)
 - 로그 없이 태스크 완료 처리 금지
+- 세션 로그 없이 세션 종료 금지
 ```
 
 ### 2. guide.md
@@ -329,11 +373,80 @@ tools: Read, Grep, Glob, Bash
 
 ## ⚡ 슬래시 커맨드 정의
 
-### 1. setup.md
+### 1. start.md
 
 ```markdown
 ---
-description: 학습 과제 초기 설정을 시작합니다
+description: 학습 세션을 시작합니다
+---
+
+학습 세션을 시작합니다.
+
+## 수행할 작업
+
+1. **세션 로그 생성/확인**: `.claude/state/logs/session-YYYY-MM-DD.md`
+   - 오늘 날짜의 세션 로그가 없으면 새로 생성
+   - 이미 있으면 이어서 작성 (재시작 기록)
+
+2. **현재 상태 확인**:
+   - `.claude/state/progress.json` 읽기
+   - `.claude/state/tasks.md`에서 현재 태스크 확인
+   - 이전 세션 로그가 있다면 마지막 진행 상황 확인
+
+3. **세션 로그에 기록**:
+   - 세션 시작 시간
+   - 현재 진행 중인 태스크
+   - 이전 세션에서 남긴 "다음에 할 일" 확인
+
+4. **사용자에게 안내**:
+   - 현재 태스크 요약
+   - 이전 세션에서 미완료된 작업
+   - 오늘 할 일 제안
+
+$ARGUMENTS
+```
+
+### 2. end.md
+
+```markdown
+---
+description: 학습 세션을 종료합니다
+---
+
+학습 세션을 종료합니다.
+
+## 수행할 작업
+
+1. **오늘 진행 내용 요약**:
+   - 현재 태스크 진행 상황 파악
+   - 완료한 작업 목록 정리
+   - 미완료 작업 목록 정리
+
+2. **세션 로그 업데이트**: `.claude/state/logs/session-YYYY-MM-DD.md`
+   - 세션 종료 시간 기록
+   - 오늘 진행한 내용 정리
+   - 커밋 내역 추가 (git log로 확인)
+   - "다음 세션에서 할 일" 작성
+
+3. **progress.json 업데이트**:
+   - lastUpdated 시간 갱신
+
+4. **커밋 제안** (선택):
+   - 커밋되지 않은 변경사항이 있으면 커밋 제안
+
+5. **사용자에게 안내**:
+   - 오늘 진행 요약
+   - 다음에 이어서 할 내용
+   - 수고했다는 인사
+
+$ARGUMENTS
+```
+
+### 3. setup.md
+
+```markdown
+---
+description: 학습 과제 초기 설정을 시작합니다 (최초 1회)
 ---
 
 SETTING.md를 읽고 학습 과제 환경을 설정합니다.
@@ -341,7 +454,7 @@ SETTING.md를 읽고 학습 과제 환경을 설정합니다.
 $ARGUMENTS
 ```
 
-### 2. hint.md
+### 4. hint.md
 
 ```markdown
 ---
@@ -360,7 +473,7 @@ description: 현재 태스크에 대한 힌트를 요청합니다
 $ARGUMENTS
 ```
 
-### 3. check.md
+### 5. check.md
 
 ```markdown
 ---
@@ -378,7 +491,7 @@ description: 과제 구현을 검증합니다
 $ARGUMENTS
 ```
 
-### 4. done.md
+### 6. done.md
 
 ```markdown
 ---
@@ -396,7 +509,7 @@ description: 현재 태스크를 완료 처리합니다
 $ARGUMENTS
 ```
 
-### 5. commit.md
+### 7. commit.md
 
 ```markdown
 ---
@@ -510,7 +623,57 @@ $ARGUMENTS
 }
 ```
 
-### 4. logs/task-[n].md 템플릿
+### 4. logs/session-YYYY-MM-DD.md 템플릿
+
+```markdown
+# 세션 로그: YYYY-MM-DD
+
+## 세션 정보
+
+- **시작**: YYYY-MM-DD HH:MM
+- **종료**: YYYY-MM-DD HH:MM
+- **현재 태스크**: Task N (태스크명)
+- **상태**: 진행 중 / 완료
+
+## 이전 세션 이어서
+
+- [이전 미완료 작업들]
+
+## 오늘 진행한 내용
+
+### [작업 내용]
+
+#### 완료한 작업
+- [x] 작업 1
+- [x] 작업 2
+
+#### 미완료 작업
+- [ ] 작업 3
+
+#### 고민한 점
+- [고민 내용]
+
+## 힌트 사용
+
+- Level N: [내용]
+
+## 커밋 내역
+
+| 해시 | 메시지 |
+|------|--------|
+| abc1234 | Feat: 기능 추가 |
+
+## 다음 세션에서 할 일
+
+- [ ] 할 일 1
+- [ ] 할 일 2
+
+## 메모
+
+- [추가 메모]
+```
+
+### 5. logs/task-[n].md 템플릿
 
 ```markdown
 # Task [N]: [태스크명]
@@ -569,13 +732,15 @@ Claude는 **직접 코드를 작성해주는 것이 아니라**,
 
 ## ⚡ 명령어
 
-| 명령어            | 설명             |
-| ----------------- | ---------------- |
-| `/project:setup`  | 초기 설정        |
-| `/project:hint`   | 힌트 요청        |
-| `/project:check`  | 과제 검증        |
-| `/project:done`   | 태스크 완료      |
-| `/project:commit` | 커밋 메시지 생성 |
+| 명령어   | 설명             |
+| -------- | ---------------- |
+| `/start` | 세션 시작        |
+| `/end`   | 세션 종료        |
+| `/setup` | 초기 설정        |
+| `/hint`  | 힌트 요청        |
+| `/check` | 과제 검증        |
+| `/done`  | 태스크 완료      |
+| `/commit`| 커밋 메시지 생성 |
 
 ## 🤖 에이전트
 
@@ -608,9 +773,11 @@ Type: 내용
 - 로그 없이 태스크 완료
 
 ### 항상 할 것
+- `/start`로 세션 시작, `/end`로 세션 종료
 - 단계적 힌트 제공 (Level 1→2→3→4)
 - 스스로 해결하도록 유도
 - 태스크 완료 시 로그 작성
+- 세션 종료 시 세션 로그 업데이트
 - 커밋 메시지 형식 준수
 
 ## 🛠️ Tech Stack
@@ -693,13 +860,15 @@ mkdir -p .claude/state/logs
 
 ### Step 3: 슬래시 커맨드 생성
 
-`.claude/commands/` 폴더에 5개 파일 생성:
+`.claude/commands/` 폴더에 7개 파일 생성:
 
-1. **setup.md** - [슬래시 커맨드 정의](#1-setupmd) 섹션 참조
-2. **hint.md** - [슬래시 커맨드 정의](#2-hintmd) 섹션 참조
-3. **check.md** - [슬래시 커맨드 정의](#3-checkmd) 섹션 참조
-4. **done.md** - [슬래시 커맨드 정의](#4-donemd) 섹션 참조
-5. **commit.md** - [슬래시 커맨드 정의](#5-commitmd) 섹션 참조
+1. **start.md** - [슬래시 커맨드 정의](#1-startmd) 섹션 참조
+2. **end.md** - [슬래시 커맨드 정의](#2-endmd) 섹션 참조
+3. **setup.md** - [슬래시 커맨드 정의](#3-setupmd) 섹션 참조
+4. **hint.md** - [슬래시 커맨드 정의](#4-hintmd) 섹션 참조
+5. **check.md** - [슬래시 커맨드 정의](#5-checkmd) 섹션 참조
+6. **done.md** - [슬래시 커맨드 정의](#6-donemd) 섹션 참조
+7. **commit.md** - [슬래시 커맨드 정의](#7-commitmd) 섹션 참조
 
 ### Step 4: 상태 파일 생성
 
@@ -726,8 +895,8 @@ mkdir -p .claude/state/logs
 
 📁 생성된 파일:
 - .claude/agents/ (task-manager, guide, analyzer, checker)
-- .claude/commands/ (setup, hint, check, done, commit)
-- .claude/state/ (learning.md, tasks.md, progress.json)
+- .claude/commands/ (start, end, setup, hint, check, done, commit)
+- .claude/state/ (learning.md, tasks.md, progress.json, logs/)
 
 ⚠️ 중요: /agents 메뉴에서 에이전트를 보려면
    Claude Code를 재시작하세요 (exit 후 claude 다시 실행)
@@ -742,10 +911,12 @@ mkdir -p .claude/state/logs
 3. 첫 번째 태스크 시작!
 
 💡 유용한 명령어:
-- /project:hint - 힌트 요청
-- /project:check - 과제 검증
-- /project:done - 태스크 완료
-- /project:commit - 커밋 메시지 생성
+- /start - 세션 시작 (매일 학습 시작 시)
+- /end - 세션 종료 (학습 마무리 시)
+- /hint - 힌트 요청
+- /check - 과제 검증
+- /done - 태스크 완료
+- /commit - 커밋 메시지 생성
 ```
 
 ---
@@ -778,12 +949,12 @@ CLAUDE.md와 task-manager.md의 커밋 규칙 확인
 
 ### 에이전트 역할
 
-| 에이전트     | 역할             | 코드 작성 |
-| ------------ | ---------------- | --------- |
-| task-manager | 관리, 로깅, 커밋 | ❌        |
-| guide        | 힌트, 개념 설명  | ❌        |
-| analyzer     | 코드 분석        | ❌        |
-| checker      | 검증, 피드백     | ❌        |
+| 에이전트     | 역할                        | 코드 작성 |
+| ------------ | --------------------------- | --------- |
+| task-manager | 관리, 로깅, 세션 관리, 커밋 | ❌        |
+| guide        | 힌트, 개념 설명             | ❌        |
+| analyzer     | 코드 분석                   | ❌        |
+| checker      | 검증, 피드백                | ❌        |
 
 ### 힌트 레벨
 
