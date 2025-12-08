@@ -16,6 +16,7 @@ Claude는 **직접 코드를 작성해주는 것이 아니라**,
 - **목표**: `.claude/state/learning.md` 참조
 - **태스크**: `.claude/state/tasks.md` 참조
 - **진행 상황**: `.claude/state/progress.json` 참조
+- **과제 체크포인트**: `.github/pull_request_template.md` 참조
 
 ## ⚡ 명령어
 
