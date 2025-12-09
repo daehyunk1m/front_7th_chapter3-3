@@ -2,15 +2,11 @@ import * as SelectPrimitive from "@radix-ui/react-select"
 import { forwardRef } from "react"
 import { Check, ChevronDown } from "lucide-react"
 
-interface SelectTriggerProps extends React.HTMLAttributes<HTMLButtonElement> {
-  className?: string
-}
+type SelectTriggerProps = React.HTMLAttributes<HTMLButtonElement>
 interface SelectContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string
   position?: "popper" | "item-aligned"
 }
 interface SelectItemProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string
   value: string
 }
 

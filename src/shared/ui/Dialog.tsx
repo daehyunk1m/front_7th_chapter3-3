@@ -2,15 +2,9 @@ import { forwardRef } from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
-interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string
-}
-interface DialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string
-}
-interface DialogTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
-  className?: string
-}
+type DialogContentProps = React.HTMLAttributes<HTMLDivElement>
+type DialogHeaderProps = React.HTMLAttributes<HTMLDivElement>
+type DialogTitleProps = React.HTMLAttributes<HTMLHeadingElement>
 
 // 대화상자 컴포넌트
 export const Dialog = DialogPrimitive.Root

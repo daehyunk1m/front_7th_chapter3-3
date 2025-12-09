@@ -2,17 +2,13 @@
 
 ## 현재 진행 중
 
-- [ ] **Task 2**: shared 레이어 구성
-  - 공통 UI 컴포넌트 분리
-  - 공통 유틸리티/로직 분리
-
-## 대기 중
-
 - [ ] **Task 3**: entities 레이어 구성
   - Post, User, Comment 등 도메인별 type 정의
   - model (순수 함수, 타입) 분리
   - ui (순수 표현 컴포넌트) 분리
   - api (서버 통신) 분리
+
+## 대기 중
 
 - [ ] **Task 4**: features 레이어 구성
   - 사용자 행동(이벤트 처리) 분리
@@ -39,8 +35,13 @@
   - 현재 코드의 구조 파악
   - 컴포넌트 크기, Type 처리, 상태 관리 등 문제점 분석
 
+- [x] **Task 2**: shared 레이어 구성
+  - 공통 UI 컴포넌트 분리 (Button, Card, Dialog, Input, Select, Table, Textarea)
+  - 공통 유틸리티/로직 분리 (shared/lib, shared/api)
+  - UI 컴포넌트 타입 수정
+
 ---
 
 **총 태스크**: 7개
-**완료**: 1개
-**진행률**: 14%
+**완료**: 2개
+**진행률**: 29%

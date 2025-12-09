@@ -1,8 +1,6 @@
 import { forwardRef } from "react"
 
-interface TextareaProps extends React.HTMLAttributes<HTMLTextAreaElement> {
-  className?: string
-}
+type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>
 
 // 텍스트 영역 컴포넌트
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, ...props }, ref) => {

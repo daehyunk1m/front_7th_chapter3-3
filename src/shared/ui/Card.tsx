@@ -1,17 +1,9 @@
 import { forwardRef } from "react"
 
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string
-}
-interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string
-}
-interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
-  className?: string
-}
-interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string
-}
+type CardProps = React.HTMLAttributes<HTMLDivElement>
+type CardHeaderProps = React.HTMLAttributes<HTMLDivElement>
+type CardTitleProps = React.HTMLAttributes<HTMLHeadingElement>
+type CardContentProps = React.HTMLAttributes<HTMLDivElement>
 
 // 카드 컴포넌트
 

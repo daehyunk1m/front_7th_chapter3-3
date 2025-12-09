@@ -1,23 +1,11 @@
 import { forwardRef } from "react"
 
-interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
-  className?: string
-}
-interface TableHeaderProps extends React.HTMLAttributes<HTMLTableSectionElement> {
-  className?: string
-}
-interface TableBodyProps extends React.HTMLAttributes<HTMLTableSectionElement> {
-  className?: string
-}
-interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
-  className?: string
-}
-interface TableHeadProps extends React.HTMLAttributes<HTMLTableCellElement> {
-  className?: string
-}
-interface TableCellProps extends React.HTMLAttributes<HTMLTableCellElement> {
-  className?: string
-}
+type TableProps = React.HTMLAttributes<HTMLTableElement>
+type TableHeaderProps = React.HTMLAttributes<HTMLTableSectionElement>
+type TableBodyProps = React.HTMLAttributes<HTMLTableSectionElement>
+type TableRowProps = React.HTMLAttributes<HTMLTableRowElement>
+type TableHeadProps = React.HTMLAttributes<HTMLTableCellElement>
+type TableCellProps = React.HTMLAttributes<HTMLTableCellElement>
 
 // 테이블 컴포넌트
 export const Table = forwardRef<HTMLTableElement, TableProps>(({ className, ...props }, ref) => (
