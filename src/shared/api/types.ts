@@ -8,3 +8,9 @@ export interface ApiResponse<T> {
   // headers: Record<string, string>
   // config: AxiosRequestConfig
 }
+
+export interface Data {
+  total: number
+  skip: number
+  limit: number
+}

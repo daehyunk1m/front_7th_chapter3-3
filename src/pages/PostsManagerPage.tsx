@@ -10,8 +10,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/Di
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/Table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/Select"
 import { HighlightText } from "@/features/search/ui/HighlightText"
-import { Post } from "@/entities/post"
-import { User } from "@/entities/user/model/types"
+
+import type { Post, NewPost, PostsData } from "@/entities/post"
+import type { User, UsersData } from "@/entities/user"
+import type { Comment, NewComment, CommentsData } from "@/entities/comment"
+import type { Tag } from "@/entities/tag"
+
+export interface PostWithAuthor extends Post {
+  author?: User
+}
 
 const PostsManager = () => {
   const navigate = useNavigate()
@@ -54,52 +61,7 @@ const PostsManager = () => {
     navigate(`?${params.toString()}`)
   }
 
-  interface Data {
-    total: number
-    skip: number
-    limit: number
-  }
-
-  interface PostsData extends Data {
-    posts: Post[]
-  }
-  interface PostWithAuthor extends Post {
-    author?: User
-  }
-  interface NewPost extends Pick<Post, "title" | "body" | "userId"> {
-    tags?: string[]
-  }
-  interface UsersData extends Data {
-    users: User[]
-  }
-
-  interface Tag {
-    slug: string
-    name: string
-    url: string
-  }
-
-  interface Comment {
-    id: number
-    body: string
-    postId: number
-    likes: number
-    user: {
-      id: number
-      username: string
-      fullName: string
-    }
-  }
-
-  interface CommentsData extends Data {
-    comments: Comment[]
-  }
-
-  interface NewComment extends Pick<Comment, "body"> {
-    postId: number | null
-    userId: number
-  }
-
+  // 여기서부터
   // 게시물 가져오기
   const fetchPosts = () => {
     setLoading(true)
@@ -320,7 +282,9 @@ const PostsManager = () => {
       console.error("댓글 좋아요 오류:", error)
     }
   }
+  // 여기까지 엔티티 분류 끝남.
 
+  // feature?
   // 게시물 상세 보기
   const openPostDetail = (post: PostWithAuthor) => {
     setSelectedPost(post)
@@ -328,6 +292,7 @@ const PostsManager = () => {
     setShowPostDetailDialog(true)
   }
 
+  // feature?
   // 사용자 모달 열기
   const openUserModal = async (user: User) => {
     try {

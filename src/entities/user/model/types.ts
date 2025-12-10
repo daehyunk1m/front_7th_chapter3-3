@@ -1,3 +1,5 @@
+import { Data } from "@/shared/api/types"
+
 export interface User {
   id: number
   firstName: string
@@ -67,4 +69,8 @@ export interface User {
     network: string
   }
   role: string
+}
+
+export interface UsersData extends Data {
+  users: User[]
 }

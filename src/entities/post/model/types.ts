@@ -1,3 +1,4 @@
+import { Data } from "@/shared/api/types"
 export interface Post {
   id: number
   title: string
@@ -9,4 +10,11 @@ export interface Post {
     likes: number
     dislikes: number
   }
+}
+
+export interface PostsData extends Data {
+  posts: Post[]
+}
+export interface NewPost extends Pick<Post, "title" | "body" | "userId"> {
+  tags?: string[]
 }

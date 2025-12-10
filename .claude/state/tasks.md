@@ -2,18 +2,12 @@
 
 ## 현재 진행 중
 
-- [ ] **Task 3**: entities 레이어 구성
-  - Post, User, Comment 등 도메인별 type 정의
-  - model (순수 함수, 타입) 분리
-  - ui (순수 표현 컴포넌트) 분리
-  - api (서버 통신) 분리
-
-## 대기 중
-
 - [ ] **Task 4**: features 레이어 구성
   - 사용자 행동(이벤트 처리) 분리
   - feature별 ui 분리
   - feature별 api 분리
+
+## 대기 중
 
 - [ ] **Task 5**: 전역상태관리 적용
   - Context API / Jotai / Zustand 중 선택 및 적용
@@ -40,8 +34,15 @@
   - 공통 유틸리티/로직 분리 (shared/lib, shared/api)
   - UI 컴포넌트 타입 수정
 
+- [x] **Task 3**: entities 레이어 구성
+  - Post, User, Comment, Tag 도메인별 폴더 구조 구성
+  - model/types.ts - 각 도메인별 타입 정의
+  - api/index.ts - 각 도메인별 API 함수 분리
+  - index.ts - public API export
+  - FSD 의존성 방향 준수
+
 ---
 
 **총 태스크**: 7개
-**완료**: 2개
-**진행률**: 29%
+**완료**: 3개
+**진행률**: 43%
