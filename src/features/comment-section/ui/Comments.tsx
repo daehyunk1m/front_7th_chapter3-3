@@ -1,29 +1,26 @@
-import { Dispatch, SetStateAction } from "react"
+import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { Edit2, Plus, ThumbsUp, Trash2 } from "lucide-react"
-import { deleteComment, likeComment, type Comment, type NewComment } from "@/entities/comment"
+import { searchQueryAtom } from "@/features/post-filter/model/atoms"
+import { deleteComment, likeComment } from "@/entities/comment"
+import {
+  commentsAtom,
+  newCommentAtom,
+  selectedCommentAtom,
+  showAddCommentDialogAtom,
+  showEditCommentDialogAtom,
+} from "@/entities/comment/model/atoms"
 import { HighlightText } from "@/shared/ui/HighlightText"
 import { Button } from "@/shared/ui/Button"
 
 // 댓글 렌더링
-export const Comments = ({
-  postId,
-  comments,
-  setNewComment,
-  setShowAddCommentDialog,
-  searchQuery,
-  setSelectedComment,
-  setShowEditCommentDialog,
-  setComments,
-}: {
-  postId: number
-  comments: Record<string, Comment[]>
-  setNewComment: Dispatch<SetStateAction<NewComment>>
-  setShowAddCommentDialog: Dispatch<SetStateAction<boolean>>
-  searchQuery: string
-  setSelectedComment: Dispatch<SetStateAction<Comment | null>>
-  setShowEditCommentDialog: Dispatch<SetStateAction<boolean>>
-  setComments: Dispatch<SetStateAction<Record<string, Comment[]>>>
-}) => {
+export const Comments = ({ postId }: { postId: number }) => {
+  const searchQuery = useAtomValue(searchQueryAtom)
+  const [comments, setComments] = useAtom(commentsAtom)
+  const setNewComment = useSetAtom(newCommentAtom)
+  const setShowAddCommentDialog = useSetAtom(showAddCommentDialogAtom)
+  const setShowEditCommentDialog = useSetAtom(showEditCommentDialogAtom)
+  const setSelectedComment = useSetAtom(selectedCommentAtom)
+
   const handleLikeComment = async (id: number, postId: number) => {
     if (!comments[postId]) throw new Error("댓글이 없습니다.")
 

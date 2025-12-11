@@ -1,26 +1,18 @@
+import { useAtom, useAtomValue } from "jotai"
+import { selectedTagAtom, tagsAtom } from "@/entities/tag/model/atoms"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/Select"
-import type { Tag } from "@/entities/tag"
 
-export const ByTag = ({
-  selectedTag,
-  setSelectedTag,
-  fetchPostsByTag,
-  updateURL,
-  tags,
-}: {
-  selectedTag: string
-  setSelectedTag: (selectedTag: string) => void
-  fetchPostsByTag: (selectedTag: string) => void
-  updateURL: () => void
-  tags: Tag[]
-}) => {
+export const ByTag = () => {
+  const tags = useAtomValue(tagsAtom)
+  const [selectedTag, setSelectedTag] = useAtom(selectedTagAtom)
+
   return (
     <Select
       value={selectedTag}
       onValueChange={(value) => {
         setSelectedTag(value)
-        fetchPostsByTag(value)
-        updateURL()
+        // fetchPostsByTag(value)
+        // updateURL()
       }}
     >
       <SelectTrigger className="w-[180px]">

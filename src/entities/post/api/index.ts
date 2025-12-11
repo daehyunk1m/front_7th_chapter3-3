@@ -86,23 +86,6 @@ export const searchPosts = async (searchQuery: string) => {
   return (await response.json()) as PostsData
 }
 
-// export const handleSearchPosts = async (searchQuery: string) => {
-//   if (!searchQuery) {
-//     //  fetchPosts()
-//     return
-//   }
-//   setLoading(true)
-
-//   try {
-//     const data = await searchPosts(searchQuery)
-//     setPosts(data.posts)
-//     setTotal(data.total)
-//   } catch (error) {
-//     console.error("게시물 검색 오류:", error)
-//   }
-//   setLoading(false)
-// }
-
 // 아무리 봐도 피쳐인거 같은데.
 // 태그별 게시물 가져오기
 // export const fetchPostsByTag = async (tag: string | undefined) => {

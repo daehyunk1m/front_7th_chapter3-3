@@ -1,22 +1,15 @@
 import { Button } from "@/shared/ui/Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/Dialog"
 import { Textarea } from "@/shared/ui/Textarea"
-import { addComment, type Comment, type NewComment } from "@/entities/comment"
-import { Dispatch, SetStateAction } from "react"
+import { addComment, type NewComment } from "@/entities/comment"
+import { commentsAtom, newCommentAtom, showAddCommentDialogAtom } from "@/entities/comment/model/atoms"
+import { useAtom, useSetAtom } from "jotai"
 
-export const AddCommentModal = ({
-  showAddCommentDialog,
-  setShowAddCommentDialog,
-  newComment,
-  setNewComment,
-  setComments,
-}: {
-  showAddCommentDialog: boolean
-  setShowAddCommentDialog: Dispatch<SetStateAction<boolean>>
-  newComment: NewComment
-  setNewComment: Dispatch<SetStateAction<NewComment>>
-  setComments: Dispatch<SetStateAction<Record<string, Comment[]>>>
-}) => {
+export const AddCommentModal = () => {
+  const [showAddCommentDialog, setShowAddCommentDialog] = useAtom(showAddCommentDialogAtom)
+  const [newComment, setNewComment] = useAtom(newCommentAtom)
+  const setComments = useSetAtom(commentsAtom)
+
   const handleAddComment = async (newComment: NewComment) => {
     try {
       const data = await addComment(newComment)
@@ -37,7 +30,7 @@ export const AddCommentModal = ({
         <div className="space-y-4">
           <Textarea
             placeholder="댓글 내용"
-            value={newComment.body}
+            value={newComment?.body || ""}
             onChange={(e) => setNewComment({ ...newComment, body: e.target.value })}
           />
           <Button onClick={() => handleAddComment(newComment)}>댓글 추가</Button>

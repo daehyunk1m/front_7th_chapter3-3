@@ -1,14 +1,12 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/Select"
+import { useAtom } from "jotai"
+import { orderAtom } from "../model/atoms"
 
-export const ByOrder = ({
-  sortOrder,
-  setSortOrder,
-}: {
-  sortOrder: string
-  setSortOrder: (sortOrder: string) => void
-}) => {
+export const ByOrder = () => {
+  const [sortOrder, setSortOrder] = useAtom(orderAtom)
+
   return (
-    <Select value={sortOrder} onValueChange={setSortOrder}>
+    <Select value={sortOrder} onValueChange={(value: typeof sortOrder) => setSortOrder(value)}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="정렬 순서" />
       </SelectTrigger>

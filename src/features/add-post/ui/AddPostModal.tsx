@@ -1,24 +1,15 @@
-import { addPost, Post, type NewPost } from "@/entities/post"
+import { addPost, newPostAtom, postsAtom, showAddDialogAtom, type NewPost } from "@/entities/post"
 import { Button } from "@/shared/ui/Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/Dialog"
 import { Input } from "@/shared/ui/Input"
 import { Textarea } from "@/shared/ui/Textarea"
+import { useAtom } from "jotai"
 
-export const AddPostModal = ({
-  showAddDialog,
-  setShowAddDialog,
-  newPost,
-  setNewPost,
-  setPosts,
-  posts,
-}: {
-  showAddDialog: boolean
-  setShowAddDialog: (showAddDialog: boolean) => void
-  newPost: NewPost
-  setNewPost: (newPost: NewPost) => void
-  setPosts: (posts: Post[]) => void
-  posts: Post[]
-}) => {
+export const AddPostModal = () => {
+  const [posts, setPosts] = useAtom(postsAtom)
+  const [newPost, setNewPost] = useAtom(newPostAtom)
+  const [showAddDialog, setShowAddDialog] = useAtom(showAddDialogAtom)
+
   const handleAddPost = async (newPost: NewPost) => {
     try {
       const data = await addPost(newPost)
@@ -29,6 +20,7 @@ export const AddPostModal = ({
       console.error("게시물 추가 오류:", error)
     }
   }
+
   return (
     <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
       <DialogContent>

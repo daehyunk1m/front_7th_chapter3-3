@@ -1,8 +1,12 @@
+import { useAtom } from "jotai"
+import { sortAtom } from "../model/atoms"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/Select"
 
-export const BySort = ({ sortBy, setSortBy }: { sortBy: string; setSortBy: (sortBy: string) => void }) => {
+export const BySort = () => {
+  const [sortBy, setSortBy] = useAtom(sortAtom)
+
   return (
-    <Select value={sortBy} onValueChange={setSortBy}>
+    <Select value={sortBy} onValueChange={(value: typeof sortBy) => setSortBy(value)}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="정렬 기준" />
       </SelectTrigger>

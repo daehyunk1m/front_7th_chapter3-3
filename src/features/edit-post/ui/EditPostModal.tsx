@@ -2,21 +2,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/Di
 import { Input } from "@/shared/ui/Input"
 import { Textarea } from "@/shared/ui/Textarea"
 import { Button } from "@/shared/ui/Button"
-import { updatePost, type PostWithAuthor } from "@/entities/post"
+import { postsAtom, selectedPostAtom, showEditDialogAtom, updatePost, type PostWithAuthor } from "@/entities/post"
+import { useAtom, useSetAtom } from "jotai"
 
-export const EditPostModal = ({
-  showEditDialog,
-  setShowEditDialog,
-  selectedPost,
-  setSelectedPost,
-  setPosts,
-}: {
-  showEditDialog: boolean
-  setShowEditDialog: (showEditDialog: boolean) => void
-  selectedPost: PostWithAuthor | null
-  setSelectedPost: React.Dispatch<React.SetStateAction<PostWithAuthor | null>>
-  setPosts: React.Dispatch<React.SetStateAction<PostWithAuthor[]>>
-}) => {
+export const EditPostModal = () => {
+  const setPosts = useSetAtom(postsAtom)
+  const [selectedPost, setSelectedPost] = useAtom(selectedPostAtom)
+  const [showEditDialog, setShowEditDialog] = useAtom(showEditDialogAtom)
+
   const handleUpdatePost = async (selectedPost: PostWithAuthor) => {
     try {
       const data = await updatePost(selectedPost) // 여기서 data는 PostWithAuthor 타입인지 Post인지 확인해봐야함.
@@ -26,6 +19,7 @@ export const EditPostModal = ({
       console.error("게시물 업데이트 오류:", error)
     }
   }
+
   return (
     <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
       <DialogContent>

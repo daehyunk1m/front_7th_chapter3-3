@@ -2,21 +2,16 @@ import { Button } from "@/shared/ui/Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/Dialog"
 import { Textarea } from "@/shared/ui/Textarea"
 import { updateComment, type Comment } from "@/entities/comment"
-import { Dispatch, SetStateAction } from "react"
+import { showEditCommentDialogAtom } from "@/entities/comment/model/atoms"
+import { selectedCommentAtom } from "@/entities/comment/model/atoms"
+import { commentsAtom } from "@/entities/comment/model/atoms"
+import { useAtom, useSetAtom } from "jotai"
 
-export const EditCommentModal = ({
-  showEditCommentDialog,
-  setShowEditCommentDialog,
-  selectedComment,
-  setSelectedComment,
-  setComments,
-}: {
-  showEditCommentDialog: boolean
-  setShowEditCommentDialog: Dispatch<SetStateAction<boolean>>
-  selectedComment: Comment | null
-  setSelectedComment: Dispatch<SetStateAction<Comment | null>>
-  setComments: Dispatch<SetStateAction<Record<string, Comment[]>>>
-}) => {
+export const EditCommentModal = () => {
+  const [showEditCommentDialog, setShowEditCommentDialog] = useAtom(showEditCommentDialogAtom)
+  const [selectedComment, setSelectedComment] = useAtom(selectedCommentAtom)
+  const setComments = useSetAtom(commentsAtom)
+
   const handleUpdateComment = async (selectedComment: Comment) => {
     try {
       const data = await updateComment(selectedComment)

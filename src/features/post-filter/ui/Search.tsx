@@ -1,15 +1,32 @@
-import { Input } from "@/shared/ui/Input"
+import { useAtom, useSetAtom } from "jotai"
 import { SearchIcon } from "lucide-react"
+import { searchQueryAtom } from "../model/atoms"
+import { searchPosts } from "@/entities/post/api"
+import { postsAtom, totalAtom } from "@/entities/post/model/atoms"
+import { Input } from "@/shared/ui/Input"
 
-export const Search = ({
-  searchQuery,
-  setSearchQuery,
-  searchPosts,
-}: {
-  searchQuery: string
-  setSearchQuery: (searchQuery: string) => void
-  searchPosts: () => void
-}) => {
+export const Search = () => {
+  const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom)
+  const setPosts = useSetAtom(postsAtom)
+  const setTotal = useSetAtom(totalAtom)
+
+  const handleSearchPosts = async (searchQuery: string) => {
+    if (!searchQuery) {
+      //  handleFetchPosts()
+      return
+    }
+    // setLoading(true)
+
+    try {
+      const data = await searchPosts(searchQuery)
+      setPosts(data.posts)
+      setTotal(data.total)
+    } catch (error) {
+      console.error("게시물 검색 오류:", error)
+    }
+    // setLoading(false)
+  }
+
   return (
     <div className="flex-1">
       <div className="relative">
@@ -19,7 +36,7 @@ export const Search = ({
           className="pl-8"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && searchPosts()}
+          onKeyDown={(e) => e.key === "Enter" && handleSearchPosts(searchQuery)}
         />
       </div>
     </div>

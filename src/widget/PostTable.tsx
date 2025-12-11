@@ -1,38 +1,36 @@
+import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { MessageSquare, ThumbsUp, ThumbsDown, Edit2, Trash2 } from "lucide-react"
+import { UserProfile } from "@/features/user-info/ui/UserProfile"
+import { searchQueryAtom } from "@/features/post-filter/model/atoms"
+import { deletePost, postsAtom, PostWithAuthor, selectedPostAtom, showEditDialogAtom } from "@/entities/post"
+import { selectedTagAtom } from "@/entities/tag/model/atoms"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/Table"
 import { HighlightText } from "@/shared/ui/HighlightText"
-import { UserProfile } from "@/features/user-info/ui/UserProfile"
 import { Button } from "@/shared/ui/Button"
+import { fetchComments } from "@/entities/comment/api"
 
-import { deletePost, type PostWithAuthor } from "@/entities/post"
-import type { User } from "@/entities/user"
+// import { selectedUserAtom } from "@/entities/user/model/atoms"
+// import { showUserModalAtom } from "@/entities/user/model/atoms"
 
 // 게시물 테이블 렌더링
-export const PostTable = ({
-  posts,
-  searchQuery,
-  selectedTag,
-  setSelectedTag,
-  updateURL,
-  openPostDetail,
-  setSelectedPost,
-  setShowEditDialog,
-  setPosts,
-  setSelectedUser,
-  setShowUserModal,
-}: {
-  posts: PostWithAuthor[]
-  searchQuery: string
-  selectedTag: string
-  setSelectedTag: (tag: string) => void
-  updateURL: () => void
-  openPostDetail: (post: PostWithAuthor) => void
-  setSelectedPost: (post: PostWithAuthor) => void
-  setShowEditDialog: (showEditDialog: boolean) => void
-  setPosts: (posts: PostWithAuthor[]) => void
-  setSelectedUser: (user: User) => void
-  setShowUserModal: (showUserModal: boolean) => void
-}) => {
+export const PostTable = () => {
+  const [posts, setPosts] = useAtom(postsAtom)
+  const [selectedTag, setSelectedTag] = useAtom(selectedTagAtom)
+
+  const searchQuery = useAtomValue(searchQueryAtom)
+  const setSelectedPost = useSetAtom(selectedPostAtom)
+  const setShowEditDialog = useSetAtom(showEditDialogAtom)
+
+  // const [selectedUser, setSelectedUser] = useAtom(selectedUserAtom)
+  // const [showUserModal, setShowUserModal] = useAtom(showUserModalAtom)
+
+  // 게시물 상세 보기
+  const openPostDetail = (post: PostWithAuthor) => {
+    setSelectedPost(post)
+    fetchComments(post.id)
+    // setShowPostDetailDialog(true)
+  }
+
   const handleDeletePost = async (id: number) => {
     try {
       await deletePost(id)
@@ -74,7 +72,7 @@ export const PostTable = ({
                       }`}
                       onClick={() => {
                         setSelectedTag(tag)
-                        updateURL()
+                        // updateURL()
                       }}
                     >
                       {tag}
@@ -83,11 +81,7 @@ export const PostTable = ({
                 </div>
               </div>
             </TableCell>
-            <TableCell>
-              {post.author && (
-                <UserProfile user={post.author} setSelectedUser={setSelectedUser} setShowUserModal={setShowUserModal} />
-              )}
-            </TableCell>
+            <TableCell>{post.author && <UserProfile />}</TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
                 <ThumbsUp className="w-4 h-4" />

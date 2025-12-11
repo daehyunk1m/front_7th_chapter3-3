@@ -1,5 +1,3 @@
-import { User, UsersData } from "./model/types"
-import { fetchUsers, fetchUserById } from "./api"
-
-export type { User, UsersData }
-export { fetchUsers, fetchUserById }
+export * from "./model/types"
+export * from "./api"
+export * from "./model/atoms"
