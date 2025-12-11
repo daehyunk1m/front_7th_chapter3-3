@@ -112,8 +112,26 @@
 ```
 
 +12-9
+760줄짜리 PostsManagerPage.tsx를 분석했다. 타입 정의,
+API 호출, 상태 관리, UI 렌더링이 한 파일에 다 들어있었다.
+"이걸 어떻게 나누지?"라는 막막함이 있었는데, FSD
+레이어별로 하나씩 분리하면 된다는 걸 깨달았다.
+
+Button, Card, Dialog 등 공통 UI 컴포넌트를 shared/ui로 분리했다.
+DialogHeader 타입을 뭘로 해야 하나 고민했는데,
+렌더링하는 요소(div)에 맞춰 HTMLDivElement로 하면 된다는 걸 알았다.
+highlightText 함수 위치도 고민이었는데, 검색 기능에
+종속적이니까 features/search로 가는 게 맞았다.
 
 +12-10
+entities 레이어 구성 완료
+Post, User, Comment, Tag 4개 도메인을 분리했다.
+model/types.ts에 타입, api/index.ts에 fetch 함수를 넣었다.
+가장 고민했던 건 PostWithAuthor 타입 위치였다. Post +
+User 조합인데 entities에 두면 서로 참조하게 돼서 FSD 규칙 위반이었다.
+결국 "조합은 상위 레이어에서"라는 원칙으로 features에 두기로 했다.
+API 함수도 순수하게 통신만 하고,
+상태 업데이트(setPosts 같은)는 features에서 하는 게 맞다는 걸 배웠다.
 
 +12-11
 

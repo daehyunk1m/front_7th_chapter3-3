@@ -1,5 +1,5 @@
 import { User, UsersData } from "./model/types"
-import { fetchUsers } from "./api"
+import { fetchUsers, fetchUserById } from "./api"
 
 export type { User, UsersData }
-export { fetchUsers }
+export { fetchUsers, fetchUserById }

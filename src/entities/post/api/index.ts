@@ -1,4 +1,5 @@
-import { PostsData, NewPost } from "../model/types"
+import type { PostWithAuthor } from "@/entities/post/@x/with-user"
+import type { PostsData, NewPost } from "../model/types"
 
 // 게시물 추가
 export const addPost = async (newPost: NewPost) => {
@@ -13,17 +14,6 @@ export const addPost = async (newPost: NewPost) => {
   const data = (await response.json()) as PostsData
   return data.posts[0]
 }
-
-// export const handleAddPost = async (newPost: NewPost) => {
-//   try {
-//     const data = await addPost(newPost)
-//     setPosts([data, ...posts])
-//     setShowAddDialog(false)
-//     setNewPost({ title: "", body: "", userId: 1 })
-//   } catch (error) {
-//     console.error("게시물 추가 오류:", error)
-//   }
-// }
 
 // 게시물 가져오기
 export const fetchPosts = async (limit: number, skip: number) => {
@@ -54,19 +44,20 @@ export const fetchPosts = async (limit: number, skip: number) => {
 //   }
 // }
 
-// // features 레이어로 이동!!
-// // 게시물 업데이트
-// export const updatePost = async (selectedPost: PostWithAuthor) => {
-//   const response = await fetch(`/api/posts/${selectedPost.id}`, {
-//     method: "PUT",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify(selectedPost),
-//   })
-//   if (!response.ok) {
-//     throw new Error("게시물 업데이트 오류: " + response.statusText)
-//   }
-//   return (await response.json()) as PostWithAuthor
-// }
+// 게시물 업데이트
+// Cross-cutting 타입은 사용하는 가장 상위 레이어에서 정의
+// 태스크 전부 진행 후 옮길 예정
+export const updatePost = async (selectedPost: PostWithAuthor) => {
+  const response = await fetch(`/api/posts/${selectedPost.id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(selectedPost),
+  })
+  if (!response.ok) {
+    throw new Error("게시물 업데이트 오류: " + response.statusText)
+  }
+  return (await response.json()) as PostWithAuthor
+}
 
 // export const handleUpdatePost = async (selectedPost: PostWithAuthor) => {
 //   try {
@@ -87,14 +78,6 @@ export const deletePost = async (id: number) => {
   }
   return await response.json() // 정확한 반환값 아직 모름.
 }
-
-// export const handleDeletePost = async (id: number) => {
-//   try {
-//     setPosts(posts.filter((post) => post.id !== id))
-//   } catch (error) {
-//     console.error("게시물 삭제 오류:", error)
-//   }
-// }
 
 // 게시물 검색
 export const searchPosts = async (searchQuery: string) => {

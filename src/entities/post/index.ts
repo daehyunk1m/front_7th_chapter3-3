@@ -1,5 +1,7 @@
 import type { Post, NewPost, PostsData } from "./model/types"
-import { addPost, fetchPosts, deletePost, searchPosts } from "./api"
+import type { PostWithAuthor } from "./@x/with-user"
 
-export type { Post, NewPost, PostsData }
-export { addPost, fetchPosts, deletePost, searchPosts }
+import { addPost, fetchPosts, deletePost, searchPosts, updatePost } from "./api"
+
+export type { Post, NewPost, PostsData, PostWithAuthor }
+export { addPost, fetchPosts, deletePost, searchPosts, updatePost }
