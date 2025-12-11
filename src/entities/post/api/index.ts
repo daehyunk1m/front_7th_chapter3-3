@@ -45,8 +45,6 @@ export const fetchPosts = async (limit: number, skip: number) => {
 // }
 
 // 게시물 업데이트
-// Cross-cutting 타입은 사용하는 가장 상위 레이어에서 정의
-// 태스크 전부 진행 후 옮길 예정
 export const updatePost = async (selectedPost: PostWithAuthor) => {
   const response = await fetch(`/api/posts/${selectedPost.id}`, {
     method: "PUT",

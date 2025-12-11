@@ -1,13 +1,53 @@
-import { useState } from "react"
-import { Button } from "@/shared/ui/Button"
+import { Dispatch, SetStateAction } from "react"
 import { Edit2, Plus, ThumbsUp, Trash2 } from "lucide-react"
+import { deleteComment, likeComment, type Comment, type NewComment } from "@/entities/comment"
 import { HighlightText } from "@/shared/ui/HighlightText"
+import { Button } from "@/shared/ui/Button"
 
 // 댓글 렌더링
-export const Comments = ({ postId }: { postId: number }) => {
-  // const [comments, setComments] = useState<Comment[]>([])
-  // const [newComment, setNewComment] = useState<NewComment>({ body: "", postId: null, userId: 1 })
-  // const [showAddCommentDialog, setShowAddCommentDialog] = useState(false)
+export const Comments = ({
+  postId,
+  comments,
+  setNewComment,
+  setShowAddCommentDialog,
+  searchQuery,
+  setSelectedComment,
+  setShowEditCommentDialog,
+  setComments,
+}: {
+  postId: number
+  comments: Record<string, Comment[]>
+  setNewComment: Dispatch<SetStateAction<NewComment>>
+  setShowAddCommentDialog: Dispatch<SetStateAction<boolean>>
+  searchQuery: string
+  setSelectedComment: Dispatch<SetStateAction<Comment | null>>
+  setShowEditCommentDialog: Dispatch<SetStateAction<boolean>>
+  setComments: Dispatch<SetStateAction<Record<string, Comment[]>>>
+}) => {
+  const handleLikeComment = async (id: number, postId: number) => {
+    if (!comments[postId]) throw new Error("댓글이 없습니다.")
+
+    const addLikes = comments[postId].find((comment) => comment.id === id)!.likes + 1
+    try {
+      const data = await likeComment(id, addLikes)
+      setComments((prev) => ({
+        ...prev,
+        [postId]: prev[postId].map((comment) => (comment.id === id ? data : comment)),
+      }))
+    } catch (error) {
+      console.error("댓글 좋아요 오류:", error)
+    }
+  }
+
+  const handleDeleteComment = async (id: number, postId: number) => {
+    try {
+      await deleteComment(id)
+      setComments((prev) => ({ ...prev, [postId]: prev[postId].filter((comment) => comment.id !== id) }))
+    } catch (error) {
+      console.error("댓글 삭제 오류:", error)
+    }
+  }
+
   return (
     <div className="mt-2">
       <div className="flex items-center justify-between mb-2">
@@ -33,7 +73,7 @@ export const Comments = ({ postId }: { postId: number }) => {
               </span>
             </div>
             <div className="flex items-center space-x-1">
-              <Button variant="ghost" size="sm" onClick={() => likeComment(comment.id, postId)}>
+              <Button variant="ghost" size="sm" onClick={() => handleLikeComment(comment.id, postId)}>
                 <ThumbsUp className="w-3 h-3" />
                 <span className="ml-1 text-xs">{comment.likes}</span>
               </Button>
@@ -47,7 +87,7 @@ export const Comments = ({ postId }: { postId: number }) => {
               >
                 <Edit2 className="w-3 h-3" />
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => deleteComment(comment.id, postId)}>
+              <Button variant="ghost" size="sm" onClick={() => handleDeleteComment(comment.id, postId)}>
                 <Trash2 className="w-3 h-3" />
               </Button>
             </div>
