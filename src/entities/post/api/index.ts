@@ -1,6 +1,7 @@
 import type { PostWithAuthor } from "@/entities/post/@x/with-user"
 import type { PostsData, NewPost } from "../model/types"
 import { fetchUsers } from "@/entities/user/api"
+import { API_BASE_URL } from "@/shared/api/config"
 
 export interface PostsWithAuthorsData {
   posts: PostWithAuthor[]
@@ -11,7 +12,7 @@ export interface PostsWithAuthorsData {
 
 // 게시물 추가
 export const addPost = async (newPost: NewPost) => {
-  const response = await fetch("/api/posts/add", {
+  const response = await fetch(`${API_BASE_URL}/posts/add`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(newPost),
@@ -26,7 +27,7 @@ export const addPost = async (newPost: NewPost) => {
 // 게시물 가져오기 (users 데이터와 병합)
 export const fetchPosts = async (limit: number, skip: number): Promise<PostsWithAuthorsData> => {
   const [postsResponse, usersData] = await Promise.all([
-    fetch(`/api/posts?limit=${limit}&skip=${skip}`),
+    fetch(`${API_BASE_URL}/posts?limit=${limit}&skip=${skip}`),
     fetchUsers(),
   ])
 
@@ -70,7 +71,7 @@ export const fetchPosts = async (limit: number, skip: number): Promise<PostsWith
 
 // 게시물 업데이트
 export const updatePost = async (selectedPost: PostWithAuthor) => {
-  const response = await fetch(`/api/posts/${selectedPost.id}`, {
+  const response = await fetch(`${API_BASE_URL}/posts/${selectedPost.id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(selectedPost),
@@ -92,7 +93,7 @@ export const updatePost = async (selectedPost: PostWithAuthor) => {
 
 // 게시물 삭제
 export const deletePost = async (id: number) => {
-  const response = await fetch(`/api/posts/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
     method: "DELETE",
   })
   if (!response.ok) {
@@ -104,7 +105,7 @@ export const deletePost = async (id: number) => {
 // 게시물 검색 (users 데이터와 병합)
 export const searchPosts = async (searchQuery: string): Promise<PostsWithAuthorsData> => {
   const [searchResponse, usersData] = await Promise.all([
-    fetch(`/api/posts/search?q=${searchQuery}`),
+    fetch(`${API_BASE_URL}/posts/search?q=${searchQuery}`),
     fetchUsers(),
   ])
 
@@ -129,7 +130,7 @@ export const searchPosts = async (searchQuery: string): Promise<PostsWithAuthors
 // 태그별 게시물 가져오기 (users 데이터와 병합)
 export const fetchPostsByTag = async (tag: string): Promise<PostsWithAuthorsData> => {
   const [postsResponse, usersData] = await Promise.all([
-    fetch(`/api/posts/tag/${tag}`),
+    fetch(`${API_BASE_URL}/posts/tag/${tag}`),
     fetchUsers(),
   ])
 
@@ -161,7 +162,7 @@ export const fetchPostsByTag = async (tag: string): Promise<PostsWithAuthorsData
 //   setLoading(true)
 //   try {
 //     const [postsResponse, usersResponse] = await Promise.all([
-//       fetch(`/api/posts/tag/${tag}`),
+//       fetch(`${API_BASE_URL}/posts/tag/${tag}`),
 //       fetch("/api/users?limit=0&select=username,image"),
 //     ])
 //     const postsData = (await postsResponse.json()) as PostsData
