@@ -41,14 +41,20 @@ export const useAddPostMutation = () => {
   })
 }
 
-// 게시물 수정
+// 게시물 수정 (낙관적 업데이트)
 export const useUpdatePostMutation = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: updatePost,
-    onSuccess: (updatedPost) => {
-      // 모든 posts list 캐시에서 해당 게시물 업데이트
+    onMutate: async (updatedPost) => {
+      // 진행 중인 refetch 취소
+      await queryClient.cancelQueries({ queryKey: postKeys.lists() })
+
+      // 이전 데이터 저장 (롤백용)
+      const previousData = queryClient.getQueriesData({ queryKey: postKeys.lists() })
+
+      // 즉시 UI 업데이트
       queryClient.setQueriesData(
         { queryKey: postKeys.lists() },
         (oldData: { posts: { id: number }[] } | undefined) => {
@@ -61,18 +67,30 @@ export const useUpdatePostMutation = () => {
           }
         },
       )
+
+      return { previousData }
+    },
+    onError: (_, __, context) => {
+      // 실패시 롤백
+      context?.previousData.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data)
+      })
     },
   })
 }
 
-// 게시물 삭제
+// 게시물 삭제 (낙관적 업데이트)
 export const useDeletePostMutation = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: deletePost,
-    onSuccess: (_, deletedId) => {
-      // 모든 posts list 캐시에서 해당 게시물 제거
+    onMutate: async (deletedId) => {
+      await queryClient.cancelQueries({ queryKey: postKeys.lists() })
+
+      const previousData = queryClient.getQueriesData({ queryKey: postKeys.lists() })
+
+      // 즉시 UI에서 삭제
       queryClient.setQueriesData(
         { queryKey: postKeys.lists() },
         (oldData: { posts: { id: number }[]; total: number } | undefined) => {
@@ -84,6 +102,14 @@ export const useDeletePostMutation = () => {
           }
         },
       )
+
+      return { previousData }
+    },
+    onError: (_, __, context) => {
+      // 실패시 롤백
+      context?.previousData.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data)
+      })
     },
   })
 }
