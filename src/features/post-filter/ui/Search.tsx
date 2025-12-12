@@ -1,30 +1,16 @@
-import { useAtom, useSetAtom } from "jotai"
+import { useState } from "react"
+import { useSetAtom } from "jotai"
 import { SearchIcon } from "lucide-react"
 import { searchQueryAtom } from "../model/atoms"
-import { searchPosts } from "@/entities/post/api"
-import { postsAtom, totalAtom } from "@/entities/post/model/atoms"
 import { Input } from "@/shared/ui/Input"
 
 export const Search = () => {
-  const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom)
-  const setPosts = useSetAtom(postsAtom)
-  const setTotal = useSetAtom(totalAtom)
+  const [inputValue, setInputValue] = useState("")
+  const setSearchQuery = useSetAtom(searchQueryAtom)
 
-  const handleSearchPosts = async (searchQuery: string) => {
-    if (!searchQuery) {
-      //  handleFetchPosts()
-      return
-    }
-    // setLoading(true)
-
-    try {
-      const data = await searchPosts(searchQuery)
-      setPosts(data.posts)
-      setTotal(data.total)
-    } catch (error) {
-      console.error("게시물 검색 오류:", error)
-    }
-    // setLoading(false)
+  // Enter 키를 눌렀을 때 검색 실행
+  const handleSearch = () => {
+    setSearchQuery(inputValue)
   }
 
   return (
@@ -34,9 +20,9 @@ export const Search = () => {
         <Input
           placeholder="게시물 검색..."
           className="pl-8"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSearchPosts(searchQuery)}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
         />
       </div>
     </div>

@@ -1,33 +1,95 @@
+import { useMemo } from "react"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { MessageSquare, ThumbsUp, ThumbsDown, Edit2, Trash2 } from "lucide-react"
 import { UserProfile } from "@/features/user-info/ui/UserProfile"
-import { searchQueryAtom, skipAtom, limitAtom } from "@/features/post-filter"
-import { PostWithAuthor, selectedPostAtom, showEditDialogAtom, usePostsQuery, useDeletePostMutation } from "@/entities/post"
+import { searchQueryAtom, skipAtom, limitAtom, sortAtom, orderAtom } from "@/features/post-filter"
+import {
+  PostWithAuthor,
+  selectedPostAtom,
+  showEditDialogAtom,
+  showPostDetailDialogAtom,
+  usePostsQuery,
+  usePostsByTagQuery,
+  useSearchPostsQuery,
+  useDeletePostMutation,
+} from "@/entities/post"
 import { selectedTagAtom } from "@/entities/tag/model/atoms"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/Table"
 import { HighlightText } from "@/shared/ui/HighlightText"
 import { Button } from "@/shared/ui/Button"
-import { fetchComments } from "@/entities/comment/api"
 
 // 게시물 테이블 렌더링
 export const PostTable = () => {
   const skip = useAtomValue(skipAtom)
   const limit = useAtomValue(limitAtom)
   const [selectedTag, setSelectedTag] = useAtom(selectedTagAtom)
-
-  const { data } = usePostsQuery(limit, skip)
-  const posts = (data?.posts ?? []) as PostWithAuthor[]
-
   const searchQuery = useAtomValue(searchQueryAtom)
+  const sortBy = useAtomValue(sortAtom)
+  const sortOrder = useAtomValue(orderAtom)
+
+  // 기본 게시물 조회
+  const { data: postsData } = usePostsQuery(limit, skip)
+  // 태그별 조회
+  const { data: tagPostsData } = usePostsByTagQuery(selectedTag)
+  // 검색 조회
+  const { data: searchPostsData } = useSearchPostsQuery(searchQuery)
+
+  // 우선순위: 검색 > 태그 > 기본 목록
+  const rawPosts = (
+    searchQuery
+      ? searchPostsData?.posts
+      : selectedTag && selectedTag !== "all"
+        ? tagPostsData?.posts
+        : postsData?.posts
+  ) ?? [] as PostWithAuthor[]
+
+  // 정렬 적용
+  const posts = useMemo(() => {
+    if (!sortBy || sortBy === "none") return rawPosts
+
+    return [...rawPosts].sort((a, b) => {
+      let compareA: number | string
+      let compareB: number | string
+
+      switch (sortBy) {
+        case "id":
+          compareA = a.id
+          compareB = b.id
+          break
+        case "title":
+          compareA = a.title
+          compareB = b.title
+          break
+        case "reactions":
+          compareA = (a.reactions?.likes ?? 0) - (a.reactions?.dislikes ?? 0)
+          compareB = (b.reactions?.likes ?? 0) - (b.reactions?.dislikes ?? 0)
+          break
+        default:
+          return 0
+      }
+
+      if (typeof compareA === "string" && typeof compareB === "string") {
+        return sortOrder === "asc"
+          ? compareA.localeCompare(compareB)
+          : compareB.localeCompare(compareA)
+      }
+
+      return sortOrder === "asc"
+        ? (compareA as number) - (compareB as number)
+        : (compareB as number) - (compareA as number)
+    })
+  }, [rawPosts, sortBy, sortOrder])
+
   const setSelectedPost = useSetAtom(selectedPostAtom)
   const setShowEditDialog = useSetAtom(showEditDialogAtom)
+  const setShowPostDetailDialog = useSetAtom(showPostDetailDialogAtom)
 
   const { mutate: deletePostMutate } = useDeletePostMutation()
 
   // 게시물 상세 보기
   const openPostDetail = (post: PostWithAuthor) => {
     setSelectedPost(post)
-    fetchComments(post.id)
+    setShowPostDetailDialog(true)
   }
 
   const handleDeletePost = (id: number) => {
@@ -79,7 +141,7 @@ export const PostTable = () => {
                 </div>
               </div>
             </TableCell>
-            <TableCell>{post.author && <UserProfile />}</TableCell>
+            <TableCell>{post.author && <UserProfile author={post.author} />}</TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
                 <ThumbsUp className="w-4 h-4" />

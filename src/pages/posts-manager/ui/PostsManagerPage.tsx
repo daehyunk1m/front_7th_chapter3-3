@@ -1,3 +1,5 @@
+import { useEffect } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 import { Plus } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/Card"
@@ -7,24 +9,55 @@ import { PostTable } from "@/widgets/post-table/ui/PostTable"
 import { UserInfoModal } from "@/features/user-info"
 import { AddPostModal } from "@/features/add-post/ui/AddPostModal"
 import { EditPostModal } from "@/features/edit-post"
-import { limitAtom, skipAtom } from "@/features/post-filter"
+import { limitAtom, skipAtom, searchQueryAtom, sortAtom, orderAtom } from "@/features/post-filter"
 import { PostFilter } from "@/widgets/post-filter/ui/PostFilter"
 import { AddCommentModal } from "@/features/comment-section/ui/AddCommentModal"
 import { EditCommentModal } from "@/features/comment-section/ui/EditCommentModal"
 import { PostDetailModal } from "@/widgets/post-detail/ui/PostDetailModal"
 import { PageNavigation } from "@/widgets/page-navigation/ui/PageNavigation"
 import { showAddDialogAtom, usePostsQuery } from "@/entities/post"
-import { useAtomValue, useSetAtom } from "jotai"
+import { selectedTagAtom } from "@/entities/tag/model/atoms"
+import { useAtom, useSetAtom } from "jotai"
 import { useTagsQuery } from "@/entities/tag"
 
 const PostsManager = () => {
-  const skip = useAtomValue(skipAtom)
-  const limit = useAtomValue(limitAtom)
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const [skip, setSkip] = useAtom(skipAtom)
+  const [limit, setLimit] = useAtom(limitAtom)
+  const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom)
+  const [sortBy, setSortBy] = useAtom(sortAtom)
+  const [sortOrder, setSortOrder] = useAtom(orderAtom)
+  const [selectedTag, setSelectedTag] = useAtom(selectedTagAtom)
 
   const { isLoading } = usePostsQuery(limit, skip)
   useTagsQuery() // 태그 조회
 
   const setShowAddDialog = useSetAtom(showAddDialogAtom)
+
+  // URL → State: URL 파라미터에서 상태 초기화
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    setSkip(parseInt(params.get("skip") || "0"))
+    setLimit(parseInt(params.get("limit") || "10"))
+    setSearchQuery(params.get("search") || "")
+    setSortBy(params.get("sortBy") || "")
+    setSortOrder((params.get("sortOrder") as "asc" | "desc") || "asc")
+    setSelectedTag(params.get("tag") || "")
+  }, [location.search, setSkip, setLimit, setSearchQuery, setSortBy, setSortOrder, setSelectedTag])
+
+  // State → URL: 상태가 변경되면 URL 업데이트
+  useEffect(() => {
+    const params = new URLSearchParams()
+    if (skip) params.set("skip", skip.toString())
+    if (limit && limit !== 10) params.set("limit", limit.toString())
+    if (searchQuery) params.set("search", searchQuery)
+    if (sortBy) params.set("sortBy", sortBy)
+    if (sortOrder && sortOrder !== "asc") params.set("sortOrder", sortOrder)
+    if (selectedTag) params.set("tag", selectedTag)
+    navigate(`?${params.toString()}`, { replace: true })
+  }, [skip, limit, searchQuery, sortBy, sortOrder, selectedTag, navigate])
 
   return (
     <Card className="w-full max-w-6xl mx-auto">

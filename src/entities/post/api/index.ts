@@ -1,5 +1,13 @@
 import type { PostWithAuthor } from "@/entities/post/@x/with-user"
 import type { PostsData, NewPost } from "../model/types"
+import { fetchUsers } from "@/entities/user/api"
+
+export interface PostsWithAuthorsData {
+  posts: PostWithAuthor[]
+  total: number
+  skip: number
+  limit: number
+}
 
 // 게시물 추가
 export const addPost = async (newPost: NewPost) => {
@@ -11,17 +19,33 @@ export const addPost = async (newPost: NewPost) => {
   if (!response.ok) {
     throw new Error("게시물 추가 오류: " + response.statusText)
   }
-  const data = (await response.json()) as PostsData
-  return data.posts[0]
+  // DummyJSON /posts/add는 단일 Post 객체를 반환
+  return await response.json()
 }
 
-// 게시물 가져오기
-export const fetchPosts = async (limit: number, skip: number) => {
-  const response = await fetch(`/api/posts?limit=${limit}&skip=${skip}`)
-  if (!response.ok) {
-    throw new Error("게시물 가져오기 오류: " + response.statusText)
+// 게시물 가져오기 (users 데이터와 병합)
+export const fetchPosts = async (limit: number, skip: number): Promise<PostsWithAuthorsData> => {
+  const [postsResponse, usersData] = await Promise.all([
+    fetch(`/api/posts?limit=${limit}&skip=${skip}`),
+    fetchUsers(),
+  ])
+
+  if (!postsResponse.ok) {
+    throw new Error("게시물 가져오기 오류: " + postsResponse.statusText)
   }
-  return (await response.json()) as PostsData
+
+  const postsData = (await postsResponse.json()) as PostsData
+  const postsWithUsers = postsData.posts.map((post) => ({
+    ...post,
+    author: usersData.users.find((user) => user.id === post.userId),
+  }))
+
+  return {
+    posts: postsWithUsers,
+    total: postsData.total,
+    skip: postsData.skip,
+    limit: postsData.limit,
+  }
 }
 
 // export const handleFetchPosts = async () => {
@@ -77,13 +101,54 @@ export const deletePost = async (id: number) => {
   return await response.json() // 정확한 반환값 아직 모름.
 }
 
-// 게시물 검색
-export const searchPosts = async (searchQuery: string) => {
-  const response = await fetch(`/api/posts/search?q=${searchQuery}`)
-  if (!response.ok) {
-    throw new Error("게시물 검색 오류: " + response.statusText)
+// 게시물 검색 (users 데이터와 병합)
+export const searchPosts = async (searchQuery: string): Promise<PostsWithAuthorsData> => {
+  const [searchResponse, usersData] = await Promise.all([
+    fetch(`/api/posts/search?q=${searchQuery}`),
+    fetchUsers(),
+  ])
+
+  if (!searchResponse.ok) {
+    throw new Error("게시물 검색 오류: " + searchResponse.statusText)
   }
-  return (await response.json()) as PostsData
+
+  const postsData = (await searchResponse.json()) as PostsData
+  const postsWithUsers = postsData.posts.map((post) => ({
+    ...post,
+    author: usersData.users.find((user) => user.id === post.userId),
+  }))
+
+  return {
+    posts: postsWithUsers,
+    total: postsData.total,
+    skip: postsData.skip,
+    limit: postsData.limit,
+  }
+}
+
+// 태그별 게시물 가져오기 (users 데이터와 병합)
+export const fetchPostsByTag = async (tag: string): Promise<PostsWithAuthorsData> => {
+  const [postsResponse, usersData] = await Promise.all([
+    fetch(`/api/posts/tag/${tag}`),
+    fetchUsers(),
+  ])
+
+  if (!postsResponse.ok) {
+    throw new Error("태그별 게시물 가져오기 오류: " + postsResponse.statusText)
+  }
+
+  const postsData = (await postsResponse.json()) as PostsData
+  const postsWithUsers = postsData.posts.map((post) => ({
+    ...post,
+    author: usersData.users.find((user) => user.id === post.userId),
+  }))
+
+  return {
+    posts: postsWithUsers,
+    total: postsData.total,
+    skip: postsData.skip,
+    limit: postsData.limit,
+  }
 }
 
 // 아무리 봐도 피쳐인거 같은데.

@@ -21,8 +21,18 @@ export const useAddCommentMutation = () => {
 
   return useMutation({
     mutationFn: addComment,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: commentKeys.list(data.postId) })
+    onSuccess: (newComment) => {
+      // 캐시에 직접 새 댓글 추가
+      queryClient.setQueryData(
+        commentKeys.list(newComment.postId),
+        (oldData: { comments: unknown[] } | undefined) => {
+          if (!oldData) return { comments: [newComment] }
+          return {
+            ...oldData,
+            comments: [...oldData.comments, newComment],
+          }
+        },
+      )
     },
   })
 }
@@ -33,8 +43,20 @@ export const useUpdateCommentMutation = (postId: number) => {
 
   return useMutation({
     mutationFn: updateComment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: commentKeys.list(postId) })
+    onSuccess: (updatedComment) => {
+      // 캐시에서 댓글 업데이트
+      queryClient.setQueryData(
+        commentKeys.list(postId),
+        (oldData: { comments: { id: number }[] } | undefined) => {
+          if (!oldData) return oldData
+          return {
+            ...oldData,
+            comments: oldData.comments.map((comment) =>
+              comment.id === updatedComment.id ? updatedComment : comment,
+            ),
+          }
+        },
+      )
     },
   })
 }
@@ -45,8 +67,18 @@ export const useDeleteCommentMutation = (postId: number) => {
 
   return useMutation({
     mutationFn: deleteComment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: commentKeys.list(postId) })
+    onSuccess: (_, deletedId) => {
+      // 캐시에서 댓글 제거
+      queryClient.setQueryData(
+        commentKeys.list(postId),
+        (oldData: { comments: { id: number }[] } | undefined) => {
+          if (!oldData) return oldData
+          return {
+            ...oldData,
+            comments: oldData.comments.filter((comment) => comment.id !== deletedId),
+          }
+        },
+      )
     },
   })
 }
@@ -57,8 +89,20 @@ export const useLikeCommentMutation = (postId: number) => {
 
   return useMutation({
     mutationFn: ({ id, likes }: { id: number; likes: number }) => likeComment(id, likes),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: commentKeys.list(postId) })
+    onSuccess: (updatedComment) => {
+      // 캐시에서 좋아요 수 업데이트
+      queryClient.setQueryData(
+        commentKeys.list(postId),
+        (oldData: { comments: { id: number }[] } | undefined) => {
+          if (!oldData) return oldData
+          return {
+            ...oldData,
+            comments: oldData.comments.map((comment) =>
+              comment.id === updatedComment.id ? updatedComment : comment,
+            ),
+          }
+        },
+      )
     },
   })
 }
