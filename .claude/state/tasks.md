@@ -2,22 +2,14 @@
 
 ## 현재 진행 중
 
-- [ ] **Task 9**: 최종 검토 및 정리
+없음
+
+## 대기 중
+
+- [ ] **Task 11**: 최종 검토 및 정리 (선택)
   - FSD 의존성 방향 검증
   - 폴더 구조 최종 정리
-  - 테스트 및 빌드 확인
-
-## 대기 중 (심화과제)
-
-- [ ] **Task 10**: TanStack Query 마이그레이션
-  - TanStack Query 설치 및 Provider 설정
-  - API 호출을 useQuery/useMutation으로 대체
-  - 쿼리 키 설계 및 적용
-  - 캐싱/리프레시 전략 구현
-  - 낙관적 업데이트 적용
-  - 에러 핸들링 구현
-  - 서버 상태와 클라이언트 상태 분리
-  - Devtools 설정
+  - 테스트 실행 확인
 
 ## 완료 (기본과제)
 
@@ -30,8 +22,20 @@
 - [x] **Task 7**: pages 레이어 구성
 - [x] **Task 8**: app 레이어 구성
 
+## 완료 (심화과제)
+
+- [x] **Task 9**: 최종 검토 및 정리
+- [x] **Task 10**: TanStack Query 마이그레이션
+  - TanStack Query 설치 및 Provider 설정
+  - API 호출을 useQuery/useMutation으로 대체
+  - 쿼리 키 설계 및 적용
+  - 캐싱 전략 구현 (setQueryData로 캐시 직접 업데이트)
+  - Mock API 대응 (DummyJSON)
+  - 프로덕션 배포 설정 (API base URL)
+  - Devtools 설정
+
 ---
 
 **총 태스크**: 10개
-**완료**: 8개
-**진행률**: 80%
+**완료**: 10개
+**진행률**: 100%

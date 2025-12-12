@@ -14,6 +14,7 @@ export const usePostsQuery = (limit: number, skip: number) => {
   return useQuery({
     queryKey: postKeys.list({ limit, skip }),
     queryFn: () => fetchPosts(limit, skip),
+    staleTime: 1000 * 60, // 1분간 fresh 상태 유지
   })
 }
 
