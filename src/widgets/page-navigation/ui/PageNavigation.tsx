@@ -1,13 +1,15 @@
-import { useAtom, useAtomValue } from "jotai"
-import { limitAtom, skipAtom } from "@/features/post-filter/model/atoms"
-import { totalAtom } from "@/entities/post/model/atoms"
+import { useAtom } from "jotai"
+import { limitAtom, skipAtom } from "@/features/post-filter"
+import { usePostsQuery } from "@/entities/post"
 import { Button } from "@/shared/ui/Button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/Select"
 
 export const PageNavigation = () => {
-  const total = useAtomValue(totalAtom)
   const [limit, setLimit] = useAtom(limitAtom)
   const [skip, setSkip] = useAtom(skipAtom)
+
+  const { data } = usePostsQuery(limit, skip)
+  const total = data?.total ?? 0
 
   return (
     <div className="flex justify-between items-center">

@@ -1,11 +1,9 @@
 import { Comments } from "@/features/comment-section/ui/Comments"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/Dialog"
 import { HighlightText } from "@/shared/ui/HighlightText"
-import { selectedPostAtom } from "@/entities/post"
-import { useAtomValue } from "jotai"
-import { useAtom } from "jotai"
-import { showPostDetailDialogAtom } from "@/entities/post/model/atoms"
-import { searchQueryAtom } from "@/features/post-filter/model/atoms"
+import { selectedPostAtom, showPostDetailDialogAtom } from "@/entities/post"
+import { searchQueryAtom } from "@/features/post-filter"
+import { useAtom, useAtomValue } from "jotai"
 
 export const PostDetailModal = () => {
   const selectedPost = useAtomValue(selectedPostAtom)

@@ -1,9 +1,8 @@
-import { Search } from "./Search"
-import { ByTag } from "./ByTag"
-import { BySort } from "./BySort"
-import { ByOrder } from "./ByOrder"
+import { Search } from "@/features/post-filter/ui/Search"
+import { ByTag } from "@/features/post-filter/ui/ByTag"
+import { BySort } from "@/features/post-filter/ui/BySort"
+import { ByOrder } from "@/features/post-filter/ui/ByOrder"
 
-// 얘는 위젯 아녀?
 export const PostFilter = () => {
   return (
     <div className="flex gap-4">

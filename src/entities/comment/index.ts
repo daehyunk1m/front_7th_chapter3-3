@@ -1,5 +1,4 @@
-import { Comment, NewComment, CommentsData } from "./model/types"
-import { deleteComment, addComment, fetchComments, updateComment, likeComment } from "./api"
-
-export type { Comment, NewComment, CommentsData }
-export { fetchComments, addComment, updateComment, deleteComment, likeComment }
+export * from "./api"
+export * from "./model/types"
+export * from "./model/atoms"
+export * from "./model/queries"

@@ -1,43 +1,41 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { MessageSquare, ThumbsUp, ThumbsDown, Edit2, Trash2 } from "lucide-react"
 import { UserProfile } from "@/features/user-info/ui/UserProfile"
-import { searchQueryAtom } from "@/features/post-filter/model/atoms"
-import { deletePost, postsAtom, PostWithAuthor, selectedPostAtom, showEditDialogAtom } from "@/entities/post"
+import { searchQueryAtom, skipAtom, limitAtom } from "@/features/post-filter"
+import { PostWithAuthor, selectedPostAtom, showEditDialogAtom, usePostsQuery, useDeletePostMutation } from "@/entities/post"
 import { selectedTagAtom } from "@/entities/tag/model/atoms"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/Table"
 import { HighlightText } from "@/shared/ui/HighlightText"
 import { Button } from "@/shared/ui/Button"
 import { fetchComments } from "@/entities/comment/api"
 
-// import { selectedUserAtom } from "@/entities/user/model/atoms"
-// import { showUserModalAtom } from "@/entities/user/model/atoms"
-
 // 게시물 테이블 렌더링
 export const PostTable = () => {
-  const [posts, setPosts] = useAtom(postsAtom)
+  const skip = useAtomValue(skipAtom)
+  const limit = useAtomValue(limitAtom)
   const [selectedTag, setSelectedTag] = useAtom(selectedTagAtom)
+
+  const { data } = usePostsQuery(limit, skip)
+  const posts = (data?.posts ?? []) as PostWithAuthor[]
 
   const searchQuery = useAtomValue(searchQueryAtom)
   const setSelectedPost = useSetAtom(selectedPostAtom)
   const setShowEditDialog = useSetAtom(showEditDialogAtom)
 
-  // const [selectedUser, setSelectedUser] = useAtom(selectedUserAtom)
-  // const [showUserModal, setShowUserModal] = useAtom(showUserModalAtom)
+  const { mutate: deletePostMutate } = useDeletePostMutation()
 
   // 게시물 상세 보기
   const openPostDetail = (post: PostWithAuthor) => {
     setSelectedPost(post)
     fetchComments(post.id)
-    // setShowPostDetailDialog(true)
   }
 
-  const handleDeletePost = async (id: number) => {
-    try {
-      await deletePost(id)
-      setPosts(posts.filter((post) => post.id !== id))
-    } catch (error) {
-      console.error("게시물 삭제 오류:", error)
-    }
+  const handleDeletePost = (id: number) => {
+    deletePostMutate(id, {
+      onError: (error) => {
+        console.error("게시물 삭제 오류:", error)
+      },
+    })
   }
 
   return (

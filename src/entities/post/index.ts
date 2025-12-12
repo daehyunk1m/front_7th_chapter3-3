@@ -1,4 +1,5 @@
 export * from "./api"
 export * from "./model/atoms"
 export * from "./model/types"
+export * from "./model/queries"
 export * from "./@x/with-user"

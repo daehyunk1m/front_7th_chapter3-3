@@ -1,24 +1,27 @@
-import { addPost, newPostAtom, postsAtom, showAddDialogAtom, type NewPost } from "@/entities/post"
+import { newPostAtom, showAddDialogAtom } from "@/entities/post"
 import { Button } from "@/shared/ui/Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/ui/Dialog"
 import { Input } from "@/shared/ui/Input"
 import { Textarea } from "@/shared/ui/Textarea"
 import { useAtom } from "jotai"
+import { useAddPostMutation } from "@/entities/post"
 
 export const AddPostModal = () => {
-  const [posts, setPosts] = useAtom(postsAtom)
   const [newPost, setNewPost] = useAtom(newPostAtom)
   const [showAddDialog, setShowAddDialog] = useAtom(showAddDialogAtom)
 
-  const handleAddPost = async (newPost: NewPost) => {
-    try {
-      const data = await addPost(newPost)
-      setPosts([data, ...posts])
-      setShowAddDialog(false)
-      setNewPost({ title: "", body: "", userId: 1 })
-    } catch (error) {
-      console.error("게시물 추가 오류:", error)
-    }
+  const { mutate: addPostMutate } = useAddPostMutation()
+
+  const handleAddPost = () => {
+    addPostMutate(newPost, {
+      onSuccess: () => {
+        setShowAddDialog(false)
+        setNewPost({ title: "", body: "", userId: 1 }) // 초기화
+      },
+      onError: (error) => {
+        console.error("게시물 추가 실패:", error)
+      },
+    })
   }
 
   return (
@@ -45,7 +48,7 @@ export const AddPostModal = () => {
             value={newPost.userId}
             onChange={(e) => setNewPost({ ...newPost, userId: Number(e.target.value) })}
           />
-          <Button onClick={() => handleAddPost(newPost)}>게시물 추가</Button>
+          <Button onClick={handleAddPost}>게시물 추가</Button>
         </div>
       </DialogContent>
     </Dialog>

@@ -1,48 +1,49 @@
-import { useAtom, useAtomValue, useSetAtom } from "jotai"
+import { useAtomValue, useSetAtom } from "jotai"
 import { Edit2, Plus, ThumbsUp, Trash2 } from "lucide-react"
-import { searchQueryAtom } from "@/features/post-filter/model/atoms"
-import { deleteComment, likeComment } from "@/entities/comment"
+import { searchQueryAtom } from "@/features/post-filter"
 import {
-  commentsAtom,
+  useCommentsQuery,
+  useDeleteCommentMutation,
+  useLikeCommentMutation,
   newCommentAtom,
   selectedCommentAtom,
   showAddCommentDialogAtom,
   showEditCommentDialogAtom,
-} from "@/entities/comment/model/atoms"
+} from "@/entities/comment"
 import { HighlightText } from "@/shared/ui/HighlightText"
 import { Button } from "@/shared/ui/Button"
 
 // 댓글 렌더링
 export const Comments = ({ postId }: { postId: number }) => {
   const searchQuery = useAtomValue(searchQueryAtom)
-  const [comments, setComments] = useAtom(commentsAtom)
   const setNewComment = useSetAtom(newCommentAtom)
   const setShowAddCommentDialog = useSetAtom(showAddCommentDialogAtom)
   const setShowEditCommentDialog = useSetAtom(showEditCommentDialogAtom)
   const setSelectedComment = useSetAtom(selectedCommentAtom)
 
-  const handleLikeComment = async (id: number, postId: number) => {
-    if (!comments[postId]) throw new Error("댓글이 없습니다.")
+  const { data } = useCommentsQuery(postId)
+  const comments = data?.comments ?? []
 
-    const addLikes = comments[postId].find((comment) => comment.id === id)!.likes + 1
-    try {
-      const data = await likeComment(id, addLikes)
-      setComments((prev) => ({
-        ...prev,
-        [postId]: prev[postId].map((comment) => (comment.id === id ? data : comment)),
-      }))
-    } catch (error) {
-      console.error("댓글 좋아요 오류:", error)
-    }
+  const { mutate: deleteCommentMutate } = useDeleteCommentMutation(postId)
+  const { mutate: likeCommentMutate } = useLikeCommentMutation(postId)
+
+  const handleLikeComment = (id: number, currentLikes: number) => {
+    likeCommentMutate(
+      { id, likes: currentLikes + 1 },
+      {
+        onError: (error) => {
+          console.error("댓글 좋아요 오류:", error)
+        },
+      },
+    )
   }
 
-  const handleDeleteComment = async (id: number, postId: number) => {
-    try {
-      await deleteComment(id)
-      setComments((prev) => ({ ...prev, [postId]: prev[postId].filter((comment) => comment.id !== id) }))
-    } catch (error) {
-      console.error("댓글 삭제 오류:", error)
-    }
+  const handleDeleteComment = (id: number) => {
+    deleteCommentMutate(id, {
+      onError: (error) => {
+        console.error("댓글 삭제 오류:", error)
+      },
+    })
   }
 
   return (
@@ -61,7 +62,7 @@ export const Comments = ({ postId }: { postId: number }) => {
         </Button>
       </div>
       <div className="space-y-1">
-        {comments[postId]?.map((comment) => (
+        {comments.map((comment) => (
           <div key={comment.id} className="flex items-center justify-between text-sm border-b pb-1">
             <div className="flex items-center space-x-2 overflow-hidden">
               <span className="font-medium truncate">{comment.user.username}:</span>
@@ -70,7 +71,7 @@ export const Comments = ({ postId }: { postId: number }) => {
               </span>
             </div>
             <div className="flex items-center space-x-1">
-              <Button variant="ghost" size="sm" onClick={() => handleLikeComment(comment.id, postId)}>
+              <Button variant="ghost" size="sm" onClick={() => handleLikeComment(comment.id, comment.likes)}>
                 <ThumbsUp className="w-3 h-3" />
                 <span className="ml-1 text-xs">{comment.likes}</span>
               </Button>
@@ -84,7 +85,7 @@ export const Comments = ({ postId }: { postId: number }) => {
               >
                 <Edit2 className="w-3 h-3" />
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => handleDeleteComment(comment.id, postId)}>
+              <Button variant="ghost" size="sm" onClick={() => handleDeleteComment(comment.id)}>
                 <Trash2 className="w-3 h-3" />
               </Button>
             </div>
